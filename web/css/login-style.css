@@ -1,0 +1,203 @@
+/* --- Cài đặt chung --- */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f8f8f8; /* Đổi sang nền xám nhạt hơn một chút */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    color: #222; /* Màu chữ chính đậm hơn */
+}
+
+/* --- Khung chính --- */
+.form-container {
+    width: 100%;
+    max-width: 450px;
+    margin: 20px;
+    padding: 40px;
+    background-color: #ffffff;
+    /* Cập nhật bóng đổ cho hiện đại hơn */
+    box-shadow: 0 6px 24px rgba(0, 0, 0, 0.07); 
+    border-radius: 8px;
+}
+
+/* --- Phần chuyển Tab --- */
+.tab-header {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 30px;
+    border-bottom: 1px solid #eee;
+}
+
+.tab-link {
+    font-size: 22px;
+    font-weight: 500;
+    color: #888;
+    background: none;
+    border: none;
+    padding: 15px 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    /* Thêm border trong suốt để khi active không bị giật layout */
+    border-bottom: 2px solid transparent; 
+}
+
+.tab-link:hover {
+    color: #000;
+}
+
+/* Khi tab được chọn (active) */
+.tab-link.active {
+    font-weight: 600; /* Giảm độ dày một chút cho tinh tế */
+    color: #000;
+    border-bottom: 2px solid #000;
+}
+
+/* --- Phần Form --- */
+.form-content {
+    display: none; /* Ẩn tất cả các form ban đầu */
+}
+
+.form-content.active {
+    display: block; /* Chỉ hiện form được chọn */
+}
+
+/* --- Các trường nhập liệu (Input) --- */
+.form-group {
+    margin-bottom: 18px;
+}
+
+.input-field {
+    width: 100%;
+    padding: 14px 16px;
+    /* Thay đổi giao diện input cho sạch sẽ */
+    border: 1px solid #e0e0e0; /* Viền xám nhạt */
+    border-radius: 5px;
+    background-color: #fff; /* Nền trắng */
+    font-size: 15px;
+    box-sizing: border-box; 
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.input-field::placeholder {
+    color: #aaa;
+}
+
+/* Thêm hiệu ứng khi click vào input */
+.input-field:focus {
+    outline: none;
+    border-color: #000; /* Viền chuyển sang màu đen */
+    box-shadow: 0 0 0 3px rgba(0,0,0,0.05); /* Thêm viền mờ */
+}
+
+/* Chia đôi cho Họ và Tên */
+.name-group {
+    display: flex;
+    gap: 15px; 
+}
+.name-group .form-group {
+    width: 50%;
+    margin-bottom: 0;
+}
+
+/* Phần chọn Giới tính */
+.gender-group {
+    display: flex;
+    align-items: center;
+    gap: 20px; 
+    padding: 10px 0;
+}
+.gender-group label {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    font-size: 15px;
+}
+/* Đổi màu nút radio thành màu đen cho hợp tông */
+.gender-group input[type="radio"] {
+    margin-right: 8px;
+    accent-color: #000; 
+}
+
+/* --- Nút Bấm (Button) --- */
+/* THAY ĐỔI QUAN TRỌNG NHẤT */
+.submit-btn {
+    width: 100%;
+    padding: 14px;
+    background-color: #000; /* CHUYỂN SANG MÀU ĐEN */
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    font-weight: 600; /* Đổi sang 600 */
+    color: #fff; /* CHỮ MÀU TRẮNG */
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    text-transform: uppercase; /* Viết hoa tất cả chữ */
+}
+
+.submit-btn:hover {
+    background-color: #333; /* Khi hover, chuyển sang màu xám đậm */
+}
+
+/* --- Link chuyển đổi (Đăng nhập ngay) --- */
+.form-footer {
+    text-align: center;
+    margin-top: 25px;
+    font-size: 14px;
+    color: #555;
+}
+.form-footer a {
+    color: #000;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+}
+.form-footer a:hover {
+    text-decoration: underline;
+}
+/* --- Branding Header --- */
+.login-header-branding {
+    text-align: center; /* Căn giữa logo và tên shop */
+    margin-bottom: 30px; /* Khoảng cách với phần tab-header */
+    padding-bottom: 20px;
+    border-bottom: 1px solid #eee; /* Đường kẻ nhẹ phía dưới */
+}
+
+.login-logo {
+    width: 80px; /* Kích thước logo, bạn có thể điều chỉnh */
+    height: auto;
+    display: block; /* Để logo nằm trên một dòng riêng */
+    margin: 0 auto 10px auto; /* Căn giữa và khoảng cách với tên shop */
+}
+
+.login-shop-name {
+    font-size: 24px; /* Kích thước tên shop */
+    font-weight: 600; /* Độ đậm chữ */
+    color: #000; /* Màu chữ đen */
+    letter-spacing: 2px; /* Khoảng cách giữa các chữ */
+    text-transform: uppercase; /* Viết hoa chữ */
+    margin: 0; /* Loại bỏ margin mặc định của h2 */
+}
+
+/* Điều chỉnh lại khoảng cách của tab-header */
+.tab-header {
+    margin-top: 20px; /* Đẩy tab-header xuống một chút so với branding */
+}
+/* CSS cho thông báo lỗi JavaScript */
+.form-error {
+    color: red;
+    background-color: #ffebee;
+    padding: 10px 15px;
+    border-radius: 5px;
+    margin-bottom: 18px; /* Giống .form-group */
+    font-size: 14px;
+    text-align: center;
+    /* Ẩn đi khi không có nội dung */
+    display: none; 
+}
+
+/* Chỉ hiển thị khi có chữ bên trong */
+.form-error:not(:empty) {
+    display: block;
+}
