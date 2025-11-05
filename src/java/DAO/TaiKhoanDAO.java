@@ -8,12 +8,16 @@ import model.TaiKhoan;
 import util.DBConnect;
 
 public class TaiKhoanDAO {
-    Connection con = null;
-    PreparedStatement ps = null;
-    ResultSet rs = null;
+    
+    // Xóa các biến thành viên (member variables) con, ps, rs khỏi đây.
 
     public TaiKhoan checkKhachHangLogin(String email, String pass) {
         String sql = "SELECT * FROM khachhang WHERE Email = ? AND MatKhau = ?";
+        // Khai báo biến cục bộ
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        
         try {
             con = new DBConnect().getConnection();
             ps = con.prepareStatement(sql);
@@ -51,6 +55,11 @@ public class TaiKhoanDAO {
     // 2. Thêm hàm mới để check NhanVien/Admin
     public NhanVien checkNhanVienLogin(String email, String pass) {
         String sql = "SELECT * FROM nhanvien WHERE Email = ? AND MatKhau = ?";
+        // Khai báo biến cục bộ
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        
         try {
             con = new DBConnect().getConnection();
             ps = con.prepareStatement(sql);
@@ -80,9 +89,14 @@ public class TaiKhoanDAO {
         return null;
     }
 
-    // Hàm checkTaiKhoan (dùng cho đăng ký) đã đúng, chỉ check bảng khachhang
+    // Hàm checkTaiKhoan (dùng cho đăng ký)
     public TaiKhoan checkTaiKhoan(String email) {
         String sql = "SELECT * FROM khachhang WHERE Email = ?";
+        // Khai báo biến cục bộ
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        
         try {
             con = new DBConnect().getConnection();
             ps = con.prepareStatement(sql);
@@ -117,6 +131,10 @@ public class TaiKhoanDAO {
 
     public void insertTaiKhoan(String maKH, String matKhau, String hoTen, int gioiTinh, String ngaySinh, String diaChi, String dienThoai, String email, int hieuLuc, int vaiTro) {
         String sql = "INSERT INTO khachhang VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        // Khai báo biến cục bộ
+        Connection con = null;
+        PreparedStatement ps = null;
+        
         try {
             con = new DBConnect().getConnection();
             ps = con.prepareStatement(sql);
@@ -142,13 +160,6 @@ public class TaiKhoanDAO {
             }
         }
     }
-    private void closeConnections() {
-        try {
-            if (rs != null) rs.close();
-            if (ps != null) ps.close();
-            if (con != null) con.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
+    
+    // Xóa phương thức closeConnections() không dùng đến
 }

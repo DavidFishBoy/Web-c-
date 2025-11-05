@@ -91,7 +91,7 @@ public class PlaceOrderServlet extends HttpServlet {
             psCTHD.executeBatch();
             
             // === 5. XÓA GIỎ HÀNG và CẬP NHẬT CART COUNT ===
-            ghDAO.xoaToanBoGioHang(maKH);
+            ghDAO.clearGioHang(maKH);
             session.setAttribute("cartCount", 0); // Reset số lượng trên header
             
             con.commit(); // Hoàn tất Transaction

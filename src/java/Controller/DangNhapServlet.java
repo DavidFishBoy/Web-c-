@@ -12,7 +12,7 @@ import DAO.GioHangDAO;
 @WebServlet(name = "DangNhapServlet", urlPatterns = {"/DangNhapServlet"})
 public class DangNhapServlet extends HttpServlet {
 
-    @Override
+   @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
@@ -27,7 +27,7 @@ public class DangNhapServlet extends HttpServlet {
 
         // Bước 1: Kiểm tra xem có phải là Khách hàng (VaiTro = 0)
         TaiKhoan kh = dao.checkKhachHangLogin(email, mk);
-NhanVien nv = dao.checkNhanVienLogin(email, mk);
+        // NhanVien nv = dao.checkNhanVienLogin(email, mk); // <--- XÓA DÒNG NÀY
 
 
         if (kh != null) {
@@ -42,7 +42,8 @@ NhanVien nv = dao.checkNhanVienLogin(email, mk);
             
         } 
         else {
-            NhanVien nv = dao.checkNhanVienLogin(email, mk);
+            // Nếu không phải khách hàng, KIỂM TRA xem có phải nhân viên
+            NhanVien nv = dao.checkNhanVienLogin(email, mk); // <--- GIỮ LẠI DÒNG NÀY
 
             if (nv != null) {
                 session.setAttribute("user", nv); 
@@ -52,8 +53,9 @@ NhanVien nv = dao.checkNhanVienLogin(email, mk);
                     case 2: // Admin
                         response.sendRedirect(request.getContextPath() + "/admin.jsp"); // Trang quản trị
                         break;
-                    default: // Các trường hợp khác
-                        response.sendRedirect(request.getContextPath() + "/TrangChuServlet");
+                    default: // Các trường hợp khác (Nhân viên)
+                        // Chuyển về trang chủ hoặc trang nhân viên nếu có
+                        response.sendRedirect(request.getContextPath() + "/TrangChuServlet"); 
                 }
             } else {
                 // Bước 3: Đăng nhập thất bại (không tìm thấy ở cả 2 bảng)
@@ -61,12 +63,5 @@ NhanVien nv = dao.checkNhanVienLogin(email, mk);
                 request.getRequestDispatcher("login.jsp").forward(request, response);
             }
         }
-    }
-
-    @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        // Chuyển hướng đến trang login nếu cố gắng truy cập GET
-        request.getRequestDispatcher("login.jsp").forward(request, response);
     }
 }

@@ -3,11 +3,14 @@
     Created on : Nov 6, 2025, 12:13:54 AM
     Author     : sphuo
 --%>
+<%@page import="model.NhanVien"%>
 <%@page import="model.DanhMuc"%>
 <%@page import="model.SanPham"%>
 <%@page import="java.util.List"%>
 <%@page import="DAO.SanPhamDAO"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@page import="model.ThongKeDoanhThu"%>
+<%@page import="DAO.HoaDonDAO"%>
 
 <%
     Object userObj = session.getAttribute("user");
@@ -15,21 +18,18 @@
     NhanVien admin = null;
     
     if (userObj == null || role == null || role != 2 || !(userObj instanceof NhanVien)) {
-
         response.sendRedirect("login.jsp");
         return; 
     } else {
- 
         admin = (NhanVien) userObj;
     }
  
     SanPhamDAO dao = new SanPhamDAO();
-   
     List<SanPham> listSP = dao.getAllSanPhamSortedByDate();
-
     List<DanhMuc> listDM = dao.getAllDanhMuc();
     
-  
+    HoaDonDAO hdDAO = new HoaDonDAO();
+    List<ThongKeDoanhThu> dataDoanhThu = hdDAO.getThongKeDoanhThu7NgayQua();
 %>
 
 <!DOCTYPE html>
@@ -38,52 +38,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Trang Quản Trị - Admin</title>
+    
     <link rel="stylesheet" href="css/bootstrap.min.css" type="text/css">
     <link rel="stylesheet" href="css/font-awesome.min.css" type="text/css">
     <link rel="stylesheet" href="css/style.css" type="text/css">
     
-    <style>
-        /* CSS đơn giản cho trang admin */
-        body {
-            background-color: #f8f9fa;
-        }
-        .admin-header {
-            padding: 20px;
-            background: #fff;
-            border-bottom: 1px solid #dee2e6;
-            margin-bottom: 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .admin-header h1 {
-            color: #111111;
-            font-weight: 700;
-        }
-        .admin-container {
-            max-width: 1400px;
-            margin: auto;
-        }
-        .card {
-            margin-bottom: 30px;
-        }
-        .card-header {
-            font-weight: 600;
-            background-color: #f1f1f1;
-        }
-        .form-control {
-            margin-bottom: 15px;
-        }
-        .table img {
-            width: 80px;
-            height: 80px;
-            object-fit: cover;
-            border-radius: 5px;
-        }
-        .btn-action {
-            margin-right: 5px;
-        }
-    </style>
+    <link rel="stylesheet" href="css/adminstyle.css" type="text/css">
+    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
 </head>
 <body>
 
@@ -96,7 +59,21 @@
     </div>
 
     <div class="admin-container">
+        
         <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        Thống Kê Doanh Thu (7 Ngày Gần Nhất)
+                    </div>
+                    <div class="card-body">
+                        <canvas id="myRevenueChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row"> 
             <div class="col-md-4">
                 <div class="card">
                     <div class="card-header">
@@ -106,27 +83,45 @@
                         <form action="QuanLySanPhamServlet" method="POST">
                             <input type="hidden" name="action" value="add">
                             
-                            <label>Tên sản phẩm:</label>
-                            <input type="text" name="tenSP" class="form-control" required>
+                            <div class="form-group">
+                                <label>Tên sản phẩm:</label>
+                                <input type="text" name="tenSP" class="form-control" required>
+                            </div>
                             
-                            <label>Danh mục:</label>
-                            <select name="maDM" class="form-control">
-                                <% for (DanhMuc dm : listDM) { %>
-                                    <option value="<%= dm.getMaDM() %>"><%= dm.getTenDM() %></option>
-                                <% } %>
-                            </select>
+                            <div class="form-group">
+                                <label>Danh mục:</label>
+                                <select name="maDM" class="form-control">
+                                    <% for (DanhMuc dm : listDM) { %>
+                                        <option value="<%= dm.getMaDM() %>"><%= dm.getTenDM() %></option>
+                                    <% } %>
+                                </select>
+                            </div>
                             
-                            <label>Giá cơ bản (VNĐ):</label>
-                            <input type="number" name="giaCoBan" class="form-control" required>
+                            <div class="form-group">
+                                <label>Giá cơ bản (VNĐ):</label>
+                                <input type="number" name="giaCoBan" class="form-control" required>
+                            </div>
+
+                                    <div class="form-group">
+                                 <label>Link hình ảnh (ví dụ: img/product-1.jpg):</label>
+                             <input type="text" name="hinhAnh" id="hinhAnhInput" class="form-control" required>
+                             </div>
+
+                                     <div class="form-group">
+                                         <label>Xem trước:</label>
+                                         <img id="imagePreview" src="" alt="Ảnh xem trước" 
+                                              style="width: 100%; max-width: 300px; height: auto; display: none; border: 1px solid #ddd; padding: 5px; border-radius: 5px;">
+                                     </div>
+
+                            <div class="form-group">
+                                <label>Mã nhà cung cấp (AP, SM, NK):</label>
+                                <input type="text" name="maNCC" class="form-control" required>
+                            </div>
                             
-                            <label>Link hình ảnh (ví dụ: img/product-1.jpg):</label>
-                            <input type="text" name="hinhAnh" class="form-control" required>
-                            
-                            <label>Mã nhà cung cấp (AP, SM, NK):</label>
-                            <input type="text" name="maNCC" class="form-control" required>
-                            
-                            <label>Mô tả sản phẩm:</label>
-                            <textarea name="moTa" class="form-control" rows="4"></textarea>
+                            <div class="form-group">
+                                <label>Mô tả sản phẩm:</label>
+                                <textarea name="moTa" class="form-control" rows="4"></textarea>
+                            </div>
                             
                             <button type="submit" class="btn btn-primary btn-block" style="margin-top: 15px;">Thêm Sản Phẩm</button>
                         </form>
@@ -140,8 +135,9 @@
                         Danh Sách Sản Phẩm
                     </div>
                     <div class="card-body">
-                        <table class="table table-bordered table-hover">
-                            <thead class="thead-light">
+                        
+                        <table class="table table-bordered table-hover table-striped">
+                            <thead class="thead-dark">
                                 <tr>
                                     <th>Mã SP</th>
                                     <th>Hình ảnh</th>
@@ -179,8 +175,22 @@
         </div>
     </div>
 
+    
     <script src="js/jquery-3.3.1.min.js"></script>
     <script src="js/bootstrap.min.js"></script>
 
+    <script>
+        // Định nghĩa biến toàn cục để tệp js/admin.js có thể đọc được
+        var chartLabels = [];
+        var chartData = [];
+        
+        <% for (ThongKeDoanhThu tk : dataDoanhThu) { %>
+            chartLabels.push("<%= tk.getNgay() %>");
+            chartData.push(<%= tk.getTongDoanhThu() %>);
+        <% } %>
+    </script>
+    
+    <script src="js/admin.js"></script>
+    
 </body>
 </html>
