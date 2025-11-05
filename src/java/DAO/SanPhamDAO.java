@@ -18,6 +18,96 @@ public class SanPhamDAO {
     PreparedStatement ps = null;
     ResultSet rs = null;
 
+    // =========================================================================
+    // CÁC HÀM CRUD MỚI CHO TRANG ADMIN
+    // =========================================================================
+
+    /**
+     * HÀM MỚI: Thêm một sản phẩm mới vào CSDL
+     * (Sử dụng cho trang admin.jsp)
+     */
+    public void addSanPham(SanPham sp) {
+        // Câu lệnh SQL INSERT
+        // NgaySanXuat sẽ tự động lấy ngày giờ hiện tại
+        String sql = "INSERT INTO sanpham (TenSP, MaDM, GiaCoBan, HinhAnh, MoTa, MaNCC, NgaySanXuat, LuotXem) "
+                   + "VALUES (?, ?, ?, ?, ?, ?, NOW(), 0)";
+        try {
+            con = new DBConnect().getConnection();
+            ps = con.prepareStatement(sql);
+            
+            // Set các tham số cho câu lệnh SQL
+            ps.setString(1, sp.getTenSP());
+            ps.setInt(2, sp.getMaDM());
+            ps.setDouble(3, sp.getGiaCoBan());
+            ps.setString(4, sp.getHinhAnh());
+            ps.setString(5, sp.getMoTa());
+            ps.setString(6, sp.getMaNCC()); // Giả sử bạn đã thêm MaNCC vào model SanPham
+            
+            // Thực thi câu lệnh
+            ps.executeUpdate();
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            closeConnections();
+        }
+    }
+
+    /**
+     * HÀM MỚI: Xóa một sản phẩm khỏi CSDL theo MaSP
+     * (Sử dụng cho trang admin.jsp)
+     */
+    public void deleteSanPham(int maSP) {
+        String sql = "DELETE FROM sanpham WHERE MaSP = ?";
+        try {
+            con = new DBConnect().getConnection();
+            ps = con.prepareStatement(sql);
+            ps.setInt(1, maSP);
+            
+            // Thực thi câu lệnh
+            ps.executeUpdate();
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            closeConnections();
+        }
+    }
+
+    /**
+     * HÀM MỚI: Cập nhật thông tin một sản phẩm
+     * (Sử dụng cho trang admin.jsp)
+     */
+    public void updateSanPham(SanPham sp) {
+        String sql = "UPDATE sanpham SET TenSP = ?, MaDM = ?, GiaCoBan = ?, HinhAnh = ?, MoTa = ?, MaNCC = ? "
+                   + "WHERE MaSP = ?";
+        try {
+            con = new DBConnect().getConnection();
+            ps = con.prepareStatement(sql);
+            
+            // Set các tham số
+            ps.setString(1, sp.getTenSP());
+            ps.setInt(2, sp.getMaDM());
+            ps.setDouble(3, sp.getGiaCoBan());
+            ps.setString(4, sp.getHinhAnh());
+            ps.setString(5, sp.getMoTa());
+            ps.setString(6, sp.getMaNCC());
+            ps.setInt(7, sp.getMaSP()); // Tham số cho WHERE
+            
+            // Thực thi
+            ps.executeUpdate();
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            closeConnections();
+        }
+    }
+    
+    // =========================================================================
+    // CÁC HÀM CŨ ĐÃ CÓ
+    // =========================================================================
+
     /**
      * HÀM MỚI: Lấy tất cả KÍCH CỠ
      */
@@ -41,6 +131,7 @@ public class SanPhamDAO {
         }
         return listKC;
     }
+    
     public List<SanPham> getAllSanPhamSortedByDate() {
         List<SanPham> listSP = new ArrayList<>();
         String sql = "SELECT * FROM sanpham ORDER BY NgaySanXuat DESC";
@@ -65,76 +156,79 @@ public class SanPhamDAO {
         }
         return listSP;
     }
-public List<SanPham> getSanPhamByFilter(String maDM_raw, String maKC_raw, String sort_raw) {
-    List<SanPham> listSP = new ArrayList<>();
     
-    // (1) Bảng và JOIN
-    // Dùng DISTINCT để không bị trùng sản phẩm khi JOIN với chitietsp
-    StringBuilder sql = new StringBuilder("SELECT DISTINCT sp.* FROM sanpham sp ");
+    public List<SanPham> getSanPhamByFilter(String maDM_raw, String maKC_raw, String sort_raw) {
+        List<SanPham> listSP = new ArrayList<>();
 
-    // Nếu có lọc theo Size, chúng ta BẮT BUỘC phải JOIN
-    if (maKC_raw != null && !maKC_raw.isEmpty()) {
-        sql.append(" JOIN chitietsp ct ON sp.MaSP = ct.MaSP ");
-    }
+        // (1) Bảng và JOIN
+        // Dùng DISTINCT để không bị trùng sản phẩm khi JOIN với chitietsp
+        StringBuilder sql = new StringBuilder("SELECT DISTINCT sp.* FROM sanpham sp ");
 
-    // (2) Điều kiện WHERE
-    sql.append(" WHERE 1=1 "); // Luôn đúng để dễ nối AND
-    
-    // Thêm điều kiện lọc Danh Mục
-    if (maDM_raw != null && !maDM_raw.isEmpty()) {
-        sql.append(" AND sp.MaDM = ? ");
-    }
-    
-    // Thêm điều kiện lọc Size
-    if (maKC_raw != null && !maKC_raw.isEmpty()) {
-        sql.append(" AND ct.MaKC = ? ");
-    }
-
-    // (3) Sắp xếp ORDER BY
-    if ("price_asc".equals(sort_raw)) {
-        sql.append(" ORDER BY sp.GiaCoBan ASC");
-    } else if ("price_desc".equals(sort_raw)) {
-        sql.append(" ORDER BY sp.GiaCoBan DESC");
-    } else {
-        // Mặc định sắp xếp theo mới nhất
-        sql.append(" ORDER BY sp.NgaySanXuat DESC");
-    }
-
-    try {
-        con = new DBConnect().getConnection();
-        ps = con.prepareStatement(sql.toString());
-        
-        // (4) Set tham số (quan trọng)
-        // Chúng ta cần một biến đếm vị trí tham số
-        int paramIndex = 1;
-        
-        if (maDM_raw != null && !maDM_raw.isEmpty()) {
-            ps.setInt(paramIndex++, Integer.parseInt(maDM_raw));
-        }
-        
+        // Nếu có lọc theo Size, chúng ta BẮT BUỘC phải JOIN
         if (maKC_raw != null && !maKC_raw.isEmpty()) {
-            ps.setInt(paramIndex++, Integer.parseInt(maKC_raw));
+            sql.append(" JOIN chitietsp ct ON sp.MaSP = ct.MaSP ");
         }
-        
-        // (5) Thực thi
-        rs = ps.executeQuery();
-        while (rs.next()) {
-            listSP.add(new SanPham(
-                    rs.getInt("MaSP"),
-                    rs.getString("TenSP"),
-                    rs.getInt("MaDM"),
-                    rs.getDouble("GiaCoBan"),
-                    rs.getString("HinhAnh"),
-                    rs.getString("MoTa"),
-                    rs.getInt("LuotXem")));
+
+        // (2) Điều kiện WHERE
+        sql.append(" WHERE 1=1 "); // Luôn đúng để dễ nối AND
+
+        // Thêm điều kiện lọc Danh Mục
+        if (maDM_raw != null && !maDM_raw.isEmpty()) {
+            sql.append(" AND sp.MaDM = ? ");
         }
-    } catch (Exception e) {
-        e.printStackTrace();
-    } finally {
-        closeConnections();
-    }
-    return listSP;
-}    // Hàm lấy Top sản phẩm xem nhiều (CHO HERO SLIDER)
+
+        // Thêm điều kiện lọc Size
+        if (maKC_raw != null && !maKC_raw.isEmpty()) {
+            sql.append(" AND ct.MaKC = ? ");
+        }
+
+        // (3) Sắp xếp ORDER BY
+        if ("price_asc".equals(sort_raw)) {
+            sql.append(" ORDER BY sp.GiaCoBan ASC");
+        } else if ("price_desc".equals(sort_raw)) {
+            sql.append(" ORDER BY sp.GiaCoBan DESC");
+        } else {
+            // Mặc định sắp xếp theo mới nhất
+            sql.append(" ORDER BY sp.NgaySanXuat DESC");
+        }
+
+        try {
+            con = new DBConnect().getConnection();
+            ps = con.prepareStatement(sql.toString());
+
+            // (4) Set tham số (quan trọng)
+            // Chúng ta cần một biến đếm vị trí tham số
+            int paramIndex = 1;
+
+            if (maDM_raw != null && !maDM_raw.isEmpty()) {
+                ps.setInt(paramIndex++, Integer.parseInt(maDM_raw));
+            }
+
+            if (maKC_raw != null && !maKC_raw.isEmpty()) {
+                ps.setInt(paramIndex++, Integer.parseInt(maKC_raw));
+            }
+
+            // (5) Thực thi
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                listSP.add(new SanPham(
+                        rs.getInt("MaSP"),
+                        rs.getString("TenSP"),
+                        rs.getInt("MaDM"),
+                        rs.getDouble("GiaCoBan"),
+                        rs.getString("HinhAnh"),
+                        rs.getString("MoTa"),
+                        rs.getInt("LuotXem")));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            closeConnections();
+        }
+        return listSP;
+    }    
+    
+    // Hàm lấy Top sản phẩm xem nhiều (CHO HERO SLIDER)
     public List<SanPham> getTopViewed(int topN) {
         List<SanPham> list = new ArrayList<>();
         String sql = "SELECT * FROM sanpham ORDER BY LuotXem DESC LIMIT ?";
@@ -162,7 +256,7 @@ public List<SanPham> getSanPhamByFilter(String maDM_raw, String maKC_raw, String
     }
 
     /**
-     *  Lấy tất cả DANH MỤC
+     * Lấy tất cả DANH MỤC
      */
     public List<DanhMuc> getAllDanhMuc() {
         List<DanhMuc> listDM = new ArrayList<>();
@@ -184,8 +278,10 @@ public List<SanPham> getSanPhamByFilter(String maDM_raw, String maKC_raw, String
         }
         return listDM;
     }
+    
     // Hàm lấy 1 sản phẩm theo MaSP (CHO TRANG CHI TIẾT)
-   public SanPham getSanPhamByMaSP(int maSP) {
+    public SanPham getSanPhamByMaSP(int maSP) {
+        // Cập nhật câu lệnh JOIN để lấy MaNCC
         String sql = "SELECT sp.*, dm.TenDM, ncc.TenCty "
                    + "FROM sanpham sp "
                    + "JOIN danhmuc dm ON sp.MaDM = dm.MaDM "
@@ -209,6 +305,7 @@ public List<SanPham> getSanPhamByFilter(String maDM_raw, String maKC_raw, String
                 // Set 2 trường mới lấy từ JOIN
                 sp.setTenDanhMuc(rs.getString("TenDM"));
                 sp.setTenNhaCungCap(rs.getString("TenCty"));
+                sp.setMaNCC(rs.getString("MaNCC")); // Thêm MaNCC
                 return sp;
             }
         } catch (Exception e) {
@@ -247,6 +344,7 @@ public List<SanPham> getSanPhamByFilter(String maDM_raw, String maKC_raw, String
         }
         return listSize;
     }
+    
     public List<HinhAnhSanPham> getListHinhAnhByMaSP(int maSP) {
         List<HinhAnhSanPham> listAnh = new ArrayList<>();
         String sql = "SELECT * FROM hinhanhsanpham WHERE MaSP = ?";
@@ -269,6 +367,7 @@ public List<SanPham> getSanPhamByFilter(String maDM_raw, String maKC_raw, String
         }
         return listAnh;
     }
+    
     public List<SanPham> getSanPhamLienQuan(int maDM, int maSP_hienTai) {
         List<SanPham> listSP = new ArrayList<>();
         // Lấy 4 sản phẩm cùng MaDM, loại trừ sản phẩm đang xem (maSP_hienTai)

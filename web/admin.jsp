@@ -1,0 +1,186 @@
+<%-- 
+    Document   : admin
+    Created on : Nov 6, 2025, 12:13:54 AM
+    Author     : sphuo
+--%>
+<%@page import="model.DanhMuc"%>
+<%@page import="model.SanPham"%>
+<%@page import="java.util.List"%>
+<%@page import="DAO.SanPhamDAO"%>
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
+
+<%
+    Object userObj = session.getAttribute("user");
+    Integer role = (Integer) session.getAttribute("role");
+    NhanVien admin = null;
+    
+    if (userObj == null || role == null || role != 2 || !(userObj instanceof NhanVien)) {
+
+        response.sendRedirect("login.jsp");
+        return; 
+    } else {
+ 
+        admin = (NhanVien) userObj;
+    }
+ 
+    SanPhamDAO dao = new SanPhamDAO();
+   
+    List<SanPham> listSP = dao.getAllSanPhamSortedByDate();
+
+    List<DanhMuc> listDM = dao.getAllDanhMuc();
+    
+  
+%>
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trang Quản Trị - Admin</title>
+    <link rel="stylesheet" href="css/bootstrap.min.css" type="text/css">
+    <link rel="stylesheet" href="css/font-awesome.min.css" type="text/css">
+    <link rel="stylesheet" href="css/style.css" type="text/css">
+    
+    <style>
+        /* CSS đơn giản cho trang admin */
+        body {
+            background-color: #f8f9fa;
+        }
+        .admin-header {
+            padding: 20px;
+            background: #fff;
+            border-bottom: 1px solid #dee2e6;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .admin-header h1 {
+            color: #111111;
+            font-weight: 700;
+        }
+        .admin-container {
+            max-width: 1400px;
+            margin: auto;
+        }
+        .card {
+            margin-bottom: 30px;
+        }
+        .card-header {
+            font-weight: 600;
+            background-color: #f1f1f1;
+        }
+        .form-control {
+            margin-bottom: 15px;
+        }
+        .table img {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 5px;
+        }
+        .btn-action {
+            margin-right: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="admin-header">
+        <h1>Bảng điều khiển Admin</h1>
+        <div>
+            <span>Chào, <strong><%= admin.getHoTen() %></strong>!</span>
+            <a href="DangXuatServlet" class="btn btn-outline-danger" style="margin-left: 15px;">Đăng xuất</a>
+        </div>
+    </div>
+
+    <div class="admin-container">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header">
+                        Thêm Sản Phẩm Mới
+                    </div>
+                    <div class="card-body">
+                        <form action="QuanLySanPhamServlet" method="POST">
+                            <input type="hidden" name="action" value="add">
+                            
+                            <label>Tên sản phẩm:</label>
+                            <input type="text" name="tenSP" class="form-control" required>
+                            
+                            <label>Danh mục:</label>
+                            <select name="maDM" class="form-control">
+                                <% for (DanhMuc dm : listDM) { %>
+                                    <option value="<%= dm.getMaDM() %>"><%= dm.getTenDM() %></option>
+                                <% } %>
+                            </select>
+                            
+                            <label>Giá cơ bản (VNĐ):</label>
+                            <input type="number" name="giaCoBan" class="form-control" required>
+                            
+                            <label>Link hình ảnh (ví dụ: img/product-1.jpg):</label>
+                            <input type="text" name="hinhAnh" class="form-control" required>
+                            
+                            <label>Mã nhà cung cấp (AP, SM, NK):</label>
+                            <input type="text" name="maNCC" class="form-control" required>
+                            
+                            <label>Mô tả sản phẩm:</label>
+                            <textarea name="moTa" class="form-control" rows="4"></textarea>
+                            
+                            <button type="submit" class="btn btn-primary btn-block" style="margin-top: 15px;">Thêm Sản Phẩm</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header">
+                        Danh Sách Sản Phẩm
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-bordered table-hover">
+                            <thead class="thead-light">
+                                <tr>
+                                    <th>Mã SP</th>
+                                    <th>Hình ảnh</th>
+                                    <th>Tên Sản Phẩm</th>
+                                    <th>Mã DM</th>
+                                    <th>Giá (VNĐ)</th>
+                                    <th>Lượt xem</th>
+                                    <th>Hành động</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% for (SanPham sp : listSP) { %>
+                                <tr>
+                                    <td><%= sp.getMaSP() %></td>
+                                    <td><img src="<%= sp.getHinhAnh() %>" alt="Ảnh SP"></td>
+                                    <td><%= sp.getTenSP() %></td>
+                                    <td><%= sp.getMaDM() %></td>
+                                    <td><%= String.format("%,.0f", sp.getGiaCoBan()) %></td>
+                                    <td><%= sp.getLuotXem() %></td>
+                                    <td>
+                                        <a href="QuanLySanPhamServlet?action=edit&id=<%= sp.getMaSP() %>" 
+                                           class="btn btn-warning btn-sm btn-action">Sửa</a>
+                                        
+                                        <a href="QuanLySanPhamServlet?action=delete&id=<%= sp.getMaSP() %>" 
+                                           class="btn btn-danger btn-sm btn-action"
+                                           onclick="return confirm('Bạn có chắc chắn muốn xóa sản phẩm này?');">Xóa</a>
+                                    </td>
+                                </tr>
+                                <% } %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/jquery-3.3.1.min.js"></script>
+    <script src="js/bootstrap.min.js"></script>
+
+</body>
+</html>

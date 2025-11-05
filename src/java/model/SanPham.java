@@ -11,6 +11,9 @@ public class SanPham {
     private String tenDanhMuc;
     private String tenNhaCungCap;
     private boolean laSPMoi;
+    
+    // TRƯỜNG MỚI ĐƯỢC THÊM
+    private String maNCC; 
 
     public boolean isLaSPMoi() {
         return laSPMoi;
@@ -106,4 +109,12 @@ public class SanPham {
         this.tenNhaCungCap = tenNhaCungCap;
     }
     
+    // GETTER & SETTER MỚI CHO MaNCC
+    public String getMaNCC() {
+        return maNCC;
+    }
+
+    public void setMaNCC(String maNCC) {
+        this.maNCC = maNCC;
+    }
 }

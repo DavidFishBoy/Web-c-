@@ -27,6 +27,8 @@ public class DangNhapServlet extends HttpServlet {
 
         // Bước 1: Kiểm tra xem có phải là Khách hàng (VaiTro = 0)
         TaiKhoan kh = dao.checkKhachHangLogin(email, mk);
+NhanVien nv = dao.checkNhanVienLogin(email, mk);
+
 
         if (kh != null) {
             // Đăng nhập thành công với tư cách Khách hàng
@@ -38,7 +40,8 @@ public class DangNhapServlet extends HttpServlet {
             // Chuyển về trang chủ
             response.sendRedirect(request.getContextPath() + "/TrangChu");
             
-        } else {
+        } 
+        else {
             NhanVien nv = dao.checkNhanVienLogin(email, mk);
 
             if (nv != null) {
@@ -48,9 +51,6 @@ public class DangNhapServlet extends HttpServlet {
                 switch (nv.getVaiTro()) {
                     case 2: // Admin
                         response.sendRedirect(request.getContextPath() + "/admin.jsp"); // Trang quản trị
-                        break;
-                    case 1: // Nhân viên
-                        response.sendRedirect(request.getContextPath() + "/nhanvien.jsp"); // Trang nhân viên
                         break;
                     default: // Các trường hợp khác
                         response.sendRedirect(request.getContextPath() + "/TrangChuServlet");
