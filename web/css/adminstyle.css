@@ -1,0 +1,257 @@
+/*
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css to edit this template
+*/
+/* 
+    Created on : Nov 6, 2025, 1:32:11 AM
+    Author     : sphuo
+*/
+
+/* CSS tùy chỉnh cho trang admin */
+body {
+    background-color: #f8f9fa; /* Màu nền xám rất nhạt */
+}
+.admin-header {
+    padding: 20px;
+    background: #ffffff; /* Header màu trắng */
+    margin-bottom: 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    /* Thêm bóng đổ tinh tế cho header */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05); 
+}
+.admin-header h1 {
+    color: #343a40; /* Màu chữ đen đậm */
+    font-weight: 700;
+    font-size: 1.75rem; /* Tăng kích thước chữ */
+}
+.admin-container {
+    max-width: 1400px;
+    margin: auto;
+}
+.card {
+    margin-bottom: 30px;
+    border: none; /* Bỏ đường viền card */
+    /* Thêm bóng đổ cho card để tạo hiệu ứng nổi */
+    box-shadow: 0 0 1rem rgba(0, 0, 0, 0.1);
+    border-radius: 8px; /* Bo góc card */
+    overflow: hidden; /* Giữ cho card-header bo góc */
+}
+.card-header {
+    font-weight: 600;
+    /* Dùng nền tối cho header của card */
+    background-color: #343a40; 
+    color: #ffffff;
+    padding: 1rem 1.25rem;
+}
+.form-group {
+    margin-bottom: 1rem; /* Tạo khoảng cách đẹp hơn cho form */
+}
+.form-control {
+    border-radius: 5px; /* Bo góc nhẹ cho input */
+}
+.table img {
+    width: 70px;
+    height: 70px;
+    object-fit: cover;
+    border-radius: 5px;
+    border: 2px solid #eee; /* Thêm viền nhẹ cho ảnh */
+    padding: 2px;
+    
+    /* HIỆU ỨNG PHÓNG TO ẢNH */
+    transition: transform 0.3s ease, z-index 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+}
+
+/* CSS KHI DI CHUỘT VÀO ẢNH */
+.table img:hover {
+    transform: scale(4.5); /* Phóng to 4.5 lần */
+    z-index: 10; /* Nổi lên trên */
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+.btn-action {
+    margin-right: 5px;
+    min-width: 50px; /* Đảm bảo các nút Sửa/Xóa đều nhau */
+}
+
+/* Cải thiện nút bấm */
+.btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+    transition: all 0.3s ease;
+}
+.btn-primary:hover {
+    transform: translateY(-2px); /* Hiệu ứng nhấc lên khi hover */
+    box-shadow: 0 4px 8px rgba(0,123,255,0.2);
+}
+.admin-layout {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* Sidebar (Menu bên trái) */
+.admin-sidebar {
+    width: 260px;
+    background-color: #343a40; /* Nền tối */
+    color: #fff;
+    padding: 20px;
+    flex-shrink: 0; /* Không co lại khi thu nhỏ */
+}
+
+.sidebar-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #adb5bd;
+    padding-bottom: 15px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #495057;
+}
+
+.admin-sidebar .nav-link {
+    color: #ced4da; /* Màu chữ thường */
+    font-size: 1rem;
+    padding: 12px 15px;
+    border-radius: 6px;
+    margin-bottom: 5px;
+    transition: all 0.2s ease;
+}
+
+.admin-sidebar .nav-link i.fa {
+    margin-right: 12px;
+    width: 20px; /* Căn chỉnh icon */
+    text-align: center;
+}
+
+.admin-sidebar .nav-link:hover {
+    background-color: #495057; /* Màu khi di chuột */
+    color: #fff;
+}
+
+.admin-sidebar .nav-link.active {
+    background-color: #e63946; /* Màu chủ đạo của bạn */
+    color: #fff;
+    font-weight: 600;
+}
+
+/* Header */
+.admin-header {
+    width: 100%;
+    padding: 20px 30px;
+    background: #ffffff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    border-bottom: 1px solid #dee2e6;
+}
+
+.admin-header h1 {
+    color: #343a40;
+    font-weight: 700;
+    font-size: 1.75rem;
+    margin: 0;
+}
+
+/* Vùng nội dung chính */
+.admin-content-wrapper {
+    flex-grow: 1; /* Chiếm hết phần còn lại */
+    background-color: #f8f9fa; /* Nền xám nhạt */
+    display: flex;
+    flex-direction: column;
+}
+
+.admin-container {
+    max-width: 100%;
+    padding: 30px;
+    flex-grow: 1;
+}
+
+/* Sửa lại CSS Card của bạn một chút */
+.card {
+    margin-bottom: 30px;
+    border: none;
+    box-shadow: 0 0 1rem rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.card-header {
+    font-weight: 600;
+    background-color: #343a40;
+    color: #ffffff;
+    padding: 1rem 1.25rem;
+}
+stat-card {
+    background: #ffffff;
+    padding: 25px;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.07);
+    display: flex;
+    align-items: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+.stat-card .icon {
+    font-size: 3rem;
+    width: 80px;
+    height: 80px;
+    line-height: 80px;
+    text-align: center;
+    border-radius: 50%;
+    margin-right: 20px;
+    flex-shrink: 0;
+}
+
+.stat-card .info h5 {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #888;
+    text-transform: uppercase;
+    margin-bottom: 5px;
+}
+
+.stat-card .info h3 {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #333;
+    margin: 0;
+}
+
+/* Màu sắc cho từng thẻ */
+.stat-card.card-revenue .icon {
+    background-color: #e0fbf6;
+    color: #00c99c;
+}
+.stat-card.card-orders .icon {
+    background-color: #fff0e4;
+    color: #ff8b26;
+}
+.stat-card.card-users .icon {
+    background-color: #e6f3ff;
+    color: #007bff;
+}
+
+/* CSS cho bảng Top Products */
+.table-top-products {
+    vertical-align: middle;
+}
+.table-top-products th {
+    background-color: #f8f9fa;
+}
+.table-top-products td:first-child {
+    font-weight: 600;
+    color: #333;
+}
+.table-top-products .badge {
+    font-size: 1rem;
+    padding: 0.5em 0.75em;
+}
